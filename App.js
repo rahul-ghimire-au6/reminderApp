@@ -3,9 +3,7 @@ import { PermissionsAndroid, Image, ScrollView, ToastAndroid, Dimensions, Button
 import { AntDesign } from '@expo/vector-icons';
 import { TextInput } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import noReminder from './assets/noReminder.png'
 import noReminder2 from './assets/noReminder2.jpg'
-import RNCalendarEvents from "react-native-calendar-events";
 
 const App = () => {
   const [reminder, setReminder] = useState([]);
@@ -18,28 +16,10 @@ const App = () => {
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
 
-  const handlePermission = async () => {
-    try {
-      RNCalendarEvents.checkPermissions((readOnly = false)).then(data => console.log(data)).catch(err => console.log(err))
 
-      RNCalendarEvents.requestPermissions((readOnly = false)).then(data => console.log(data)).catch(err => console.log(err))
-      write_calender = await PermissionsAndroid.WRITE_CALENDAR
-      read_calender = await PermissionsAndroid.READ_CALENDAR
-      if (granted === PermissionsAndroid.check(write_calender) &&
-        granted === PermissionsAndroid.check(read_calender)) {
-        console.log('You can use the CALENDAR');
-      } else {
-        console.log('CALENDAR permission denied');
-      }
-
-    } catch (err) {
-      console.log(err)
-    }
-  }
 
 
   useEffect(() => {
-    handlePermission()
     let a = new Date()
     let temp1 = `${a.getDate()}/${a.getMonth() + 1}/${a.getFullYear()}`
     let temp2 = `${a.getHours()}:${a.getMinutes()}`
@@ -116,13 +96,6 @@ const App = () => {
     const endDate = `${fullDate.getFullYear()}-${fullDate.getMonth + 1}-${fullDate.getDate()}T${fullDate.getHours + 2}:${fullDate.getMinutes}:00.000Z`
     setReminder([...reminder, ...newArrayData])
     setModalVisible(false)
-    RNCalendarEvents.saveEvent(title, {
-      startDate: fullDate,  //needs string
-      endDate: endDate,    //needs string
-      alarms: [{
-        date: fullDate      //needs string
-      }]
-    }).then(data => console.log(data)).catch(err => console.log(err))
   }
 
   return (
