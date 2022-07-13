@@ -4,10 +4,10 @@
     "slug": "reminderApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/noReminder.png",
+    "icon": "./assets/reminderIcon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/noReminder2.jpg",
+      "image": "./assets/reminder_splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
