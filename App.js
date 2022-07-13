@@ -1,11 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { PermissionsAndroid, Image, ScrollView, ToastAndroid, Dimensions, Button, Alert, Modal, StyleSheet, Text, Pressable, View } from "react-native";
+import React, { useState, useEffect,useRef } from "react";
+import { Image, ScrollView, ToastAndroid, Dimensions, Button, Alert, Modal, StyleSheet, Text, Pressable, View } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { TextInput } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import noReminder2 from './assets/noReminder2.jpg'
+import noReminder2 from './assets/noReminder2.jpg';
+import * as Notifications from 'expo-notifications';
+import {registerForPushNotificationsAsync,cancelNotification} from './notificationHelper';
+
+
+
 
 const App = () => {
+  //notification code here
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+  //end of notification code here
   const [reminder, setReminder] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [fullDate, setFullDate] = useState(new Date());
@@ -17,6 +28,28 @@ const App = () => {
   const [show, setShow] = useState(false);
 
 
+  //initialization
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
+
+  const handleNotification = async (data) => {
+    const trigger = new Date(data.fullDate);
+    // setting up scheduler
+    const id = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: data.title,
+        body: data.description===undefined?"":data.description,
+        sound: 'nokia_03.wav',
+      },
+      trigger
+    });
+    return id;
+  }
 
 
   useEffect(() => {
@@ -25,6 +58,28 @@ const App = () => {
     let temp2 = `${a.getHours()}:${a.getMinutes()}`
     setDate(temp1)
     setTime(temp2)
+    //start of code for local hotification
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response);
+      });
+
+    return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+    //end of code for local notification
   }, [])
 
   const onChangeDate = (event, selectedDate) => {
@@ -86,14 +141,15 @@ const App = () => {
       }
     }
     const colorArray = ['#33cc33', '#ff9900', '#ff6699', '#ffff66', '#cc3300', '#3399ff', '#9900ff', '#669999', '#999966', '#cc0000']
+    const notificationID = await handleNotification({title,description,fullDate})
     let newArrayData = [{
       id: reminder.length + 1,
       title: title,
       description: description,
       time: fullDate,
-      color: colorArray[Math.floor(Math.random() * 11)]
-    }]
-    const endDate = `${fullDate.getFullYear()}-${fullDate.getMonth + 1}-${fullDate.getDate()}T${fullDate.getHours + 2}:${fullDate.getMinutes}:00.000Z`
+      color: colorArray[Math.floor(Math.random() * 11)],
+      notificationID
+    }]  
     setReminder([...reminder, ...newArrayData])
     setModalVisible(false)
   }
@@ -349,28 +405,31 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
     // borderColor: '#000',
     width: width / 1.05,
-    height: height / 1.4
+    height: height / 1.4,
   },
   reminderBlockContainer: {
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
+    // justifyContent: "center"
   },
   reminderDiv: {
     // borderWidth: 1,
     // borderColor: "black",
     borderRadius: 10,
-    width: 205,
-    height: 205,
+    // width: 205,
+    // height: 205,
+    width: width/2.4,
+    height: height/4.2,
     margin: 10,
-    shadowColor: "#000",
+    shadowColor: "#eee",
     shadowOffset: {
       width: 0,
       height: 2
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5,
+    elevation: 4,
   },
   reminderSubDiv: {
     marginLeft: 15,
