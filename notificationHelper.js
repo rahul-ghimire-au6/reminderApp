@@ -1,6 +1,6 @@
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
-import {  Platform } from "react-native";
+import { Platform } from "react-native";
 
 
 export async function registerForPushNotificationsAsync() {
@@ -29,6 +29,7 @@ export async function registerForPushNotificationsAsync() {
             importance: Notifications.AndroidImportance.MAX,
             vibrationPattern: [0, 250, 250, 250],
             sound: true,
+            priority: 'high',
             lightColor: "#FF231F7C",
             lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
             bypassDnd: true,

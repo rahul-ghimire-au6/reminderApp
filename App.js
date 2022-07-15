@@ -39,12 +39,32 @@ const App = () => {
 
   const handleNotification = async (data) => {
     const trigger = new Date(data.fullDate);
+    const generateId = await Notifications.setNotificationChannelAsync('new-emails', {
+      name: 'reminder notifications',
+      importance: Notifications.AndroidImportance.HIGH,
+      sound: 'default', // <- for Android 8.0+, see channelId property below
+      vibrationPattern:[0, 250, 250, 250],
+      enableLights:true,
+      enableVibrate:true,
+      bypassDnd:true,
+      priority: 'high'
+
+    });
+    // console.log(generateId)
+    trigger.channelId = generateId.id
+
+
     // setting up scheduler
     const id = await Notifications.scheduleNotificationAsync({
       content: {
         title: data.title,
         body: data.description===undefined?"":data.description,
-        sound: 'nokia_03.wav',
+        sound: 'default',
+        vibrationPattern:[0, 250, 250, 250],
+        enableLights:true,
+        enableVibrate:true,
+        bypassDnd:true,
+        priority: 'high',
       },
       trigger
     });
@@ -140,7 +160,7 @@ const App = () => {
           return ToastAndroid.show("Please Select valid Time", ToastAndroid.SHORT)
       }
     }
-    const colorArray = ['#33cc33', '#ff9900', '#ff6699', '#ffff66', '#cc3300', '#3399ff', '#9900ff', '#669999', '#999966', '#cc0000']
+    const colorArray = ['#33cc33', '#ff9900', '#ff6699', '#ffff66', '#cc3300', '#3399ff', '#9900ff', '#669999', '#999966', '#cc0000','#85929E']
     const notificationID = await handleNotification({title,description,fullDate})
     let newArrayData = [{
       id: reminder.length + 1,
@@ -171,9 +191,11 @@ const App = () => {
               {reminder.length === 0 ? <View><Image source={noReminder2} /></View> : reminder.map((element) => (
                 <View key={element.id} style={[styles.reminderDiv, { backgroundColor: element.color }]}>
                   <View style={styles.reminderSubDiv}>
+                  <ScrollView>
                     <View><Text style={styles.titleText}>{element.title}</Text></View>
                     <View><Text style={styles.descriptionText}>{element.description}</Text></View>
                     <View style={styles.dateTextContainer}><Text style={styles.dateText}>{handleDisplayDate(element.time)}</Text></View>
+                    </ScrollView>
                   </View>
                 </View>
               ))}

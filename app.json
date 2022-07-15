@@ -21,10 +21,13 @@
       "supportsTablet": true
     },
     "android": {
+      "useNextNotificationsApi": true,
+      "permissions": ["RECEIVE_BOOT_COMPLETED"],
       "adaptiveIcon": {
         "foregroundImage": "./assets/reminderIcon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.rahul.reminderApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,7 +36,7 @@
       [
         "expo-notifications",
         {
-          "sounds": ["./assets/nokia_03.wav"]
+          "sounds": ["./assets/nokia_03.wav","assets/nokia_03.wav"]
         }
       ]
     ]
